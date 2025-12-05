@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>VoleiReserve - Sistema de Reservas de Voleibol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Paleta de colores pastel deportivos */
+            --primary: #FFB6C1; /* Rosa pastel - principal */
+            --secondary: #B5EAD7; /* Verde menta pastel */
+            --accent: #AEC6CF; /* Azul pastel */
+            --light: #FFF9E6; /* Amarillo claro pastel */
+            --dark: #8A7F8D; /* Gris morado suave */
+            --success: #C7F0BD; /* Verde pastel */
+            --error: #FFCCCB; /* Rojo pastel */
+            --text-dark: #5D576B;
+            --text-light: #FFFFFF;
+            --shadow: 0 8px 25px rgba(141, 131, 165, 0.2);
+            --radius: 18px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, var(--light), #F5F7FF);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            position: relative;
+        }
+
+        .pantalla {
+            display: none;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 40px 35px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .pantalla::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+
+        .visible {
+            display: block;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            color: var(--primary);
+        }
+
+        .logo i {
+            font-size: 32px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+
+        .logo h1 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 28px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        h2 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 26px;
+            margin-bottom: 30px;
+            color: var(--text-dark);
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h2::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            width: 50%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        .sports-icon {
+            font-size: 28px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 22px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-size: 15px;
+            padding-left: 5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent);
+            z-index: 1;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 16px 16px 16px 45px;
+            border: 2px solid #E8E8E8;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Nunito', sans-serif;
+            transition: all 0.3s ease;
+            background-color: #FCFCFC;
+            color: var(--text-dark);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(174, 198, 207, 0.3);
+            background-color: white;
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            box-shadow: 0 6px 20px rgba(255, 182, 193, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 182, 193, 0.5);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(90deg, var(--accent), #B5C6E0);
+            color: white;
+            margin-top: 15px;
+            box-shadow: 0 6px 20px rgba(174, 198, 207, 0.4);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(174, 198, 207, 0.5);
+        }
+
+        .msg {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            min-height: 25px;
+            text-align: center;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .error-msg {
+            background-color: var(--error);
+            color: #A32E2C;
+            border-left: 5px solid #FF6B6B;
+        }
+
+        .success-msg {
+            background-color: var(--success);
+            color: #2A5A2A;
+            border-left: 5px solid #51CF66;
+        }
+
+        .info-msg {
+            background-color: rgba(174, 198, 207, 0.2);
+            color: var(--dark);
+            border-left: 5px solid var(--accent);
+        }
+
+        .decorative-image {
+            width: 100%;
+            height: 120px;
+            border-radius: 12px;
+            margin: 25px 0;
+            background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), 
+                        url('https://images.unsplash.com/photo-1592656094267-764a8c9d89ed?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .decorative-image::after {
+            content: "🏐 VoleiReserve";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.6));
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .court-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .court-option {
+            display: flex;
+            align-items: center;
+            padding: 18px;
+            border-radius: 12px;
+            background-color: #F8F9FF;
+            border: 2px solid #E8E8E8;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .court-option:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            box-shadow: 0 5px 15px rgba(174, 198, 207, 0.2);
+        }
+
+        .court-icon {
+            font-size: 28px;
+            margin-right: 15px;
+            color: var(--accent);
+        }
+
+        .court-info h4 {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--text-dark);
+        }
+
+        .court-info p {
+            font-size: 14px;
+            color: var(--dark);
+        }
+
+        .user-welcome {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .user-welcome h3 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .user-welcome p {
+            opacity: 0.9;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .ball-bounce {
+            animation: bounce 2s infinite;
+        }
+
+        .footer-note {
+            margin-top: 25px;
+            font-size: 14px;
+            color: var(--dark);
+            opacity: 0.8;
+            text-align: center;
+        }
+
+        /* Estilos específicos para pantallas */
+        #login .decorative-image {
+            background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), 
+                              url('https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80');
+        }
+
+        #solicitar .decorative-image {
+            background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), 
+                              url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80');
+        }
+
+        #panel .decorative-image {
+            background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.1)), 
+                              url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80');
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Pantalla de Registro -->
+        <div id="registro" class="pantalla visible">
+            <div class="logo">
+                <i class="fas fa-volleyball-ball ball-bounce">
+                <h1>reserva tu cancha</h1>
+            </div>
+            
+            <h2><i class="fas fa-user-plus sports-icon"></i> Crear Cuenta</h2>
+            
+            <div class="decorative-image"></div>
+            
+            <div class="form-group">
+                <label for="rNombre"><i class="fas fa-id-card"></i> Nombre</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input id="rNombre" type="text" placeholder="Ingresa tu nombre">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="rApellido"><i class="fas fa-id-card"></i> Apellido</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user-friends"></i>
+                    <input id="rApellido" type="text" placeholder="Ingresa tu apellido">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="rEmail"><i class="fas fa-envelope"></i> Email</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-at"></i>
+                    <input id="rEmail" type="email" placeholder="ejemplo@email.com">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="rEdad"><i class="fas fa-birthday-cake"></i> Edad</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-calendar-alt"></i>
+                    <input id="rEdad" type="number" min="1" placeholder="Debes ser mayor de 18">
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="registrar()">
+                <i class="fas fa-user-check"></i> Crear Cuenta
+            </button>
+            
+            <div id="msgRegistro" class="msg"></div>
+            
+            <div class="footer-note">
+                <p><i class="fas fa-info-circle"></i> Al registrarte, recibirás una contraseña temporal por correo electrónico.</p>
+            </div>
+        </div>
+
+        <!-- Pantalla de Login -->
+        <div id="login" class="pantalla">
+            <div class="logo">
+                <i class="fas fa-volleyball-ball ball-bounce"></i>
+                <h1>VoleiReserve</h1>
+            </div>
+            
+            <h2><i class="fas fa-sign-in-alt sports-icon"></i> Iniciar Sesión</h2>
+            
+            <div class="decorative-image"></div>
+            
+            <div class="form-group">
+                <label for="lEmail"><i class="fas fa-envelope"></i> Email</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-at"></i>
+                    <input id="lEmail" type="email" placeholder="Tu correo registrado">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="lPass"><i class="fas fa-key"></i> Contraseña</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input id="lPass" type="password" placeholder="Tu contraseña">
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="iniciarSesion()">
+                <i class="fas fa-sign-in-alt"></i> Acceder al Sistema
+            </button>
+            
+            <div id="msgLogin" class="msg"></div>
+            
+            <div class="footer-note">
+                <p><i class="fas fa-shield-alt"></i> Tu información está protegida con encriptación de última generación.</p>
+            </div>
+        </div>
+
+        <!-- Panel de Control -->
+        <div id="panel" class="pantalla">
+            <div class="logo">
+                <i class="fas fa-volleyball-ball ball-bounce"></i>
+                <h1>VoleiReserve</h1>
+            </div>
+            
+            <h2><i class="fas fa-tachometer-alt sports-icon"></i> Panel de Control</h2>
+            
+            <div class="decorative-image"></div>
+            
+            <div class="user-welcome">
+                <h3 id="userWelcome">¡Bienvenida, Jugadora!</h3>
+                <p>Gestiona tus reservas de canchas de voleibol</p>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn-primary" onclick="abrirSolicitar()">
+                    <i class="fas fa-calendar-plus"></i> Nueva Reserva
+                </button>
+                
+                <button class="btn-secondary" onclick="cerrarSesion()">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </div>
+            
+            <div class="footer-note">
+                <p><i class="fas fa-question-circle"></i> ¿Necesitas ayuda? Contacta al soporte: soporte@voleireserve.com</p>
+            </div>
+        </div>
+
+        <!-- Pantalla de Solicitud de Turno -->
+        <div id="solicitar" class="pantalla">
+            <div class="logo">
+                <i class="fas fa-volleyball-ball ball-bounce"></i>
+                <h1>VoleiReserve</h1>
+            </div>
+            
+            <h2><i class="fas fa-calendar-check sports-icon"></i> Reservar Cancha</h2>
+            
+            <div class="decorative-image"></div>
+            
+            <div class="court-options">
+                <div class="court-option" onclick="seleccionarCancha(1)">
+                    <div class="court-icon">
+                        <i class="fas fa-volleyball-ball"></i>
+                    </div>
+                    <div class="court-info">
+                        <h4>Cancha 1 - Arena Profesional</h4>
+                        <p>Superficie de arena regulada, ideal para torneos</p>
+                    </div>
+                </div>
+                
+                <div class="court-option" onclick="seleccionarCancha(2)">
+                    <div class="court-icon">
+                        <i class="fas fa-volleyball-ball"></i>
+                    </div>
+                    <div class="court-info">
+                        <h4>Cancha 2 - Césped Sintético</h4>
+                        <p>Superficie amortiguada, perfecta para entrenamientos</p>
+                    </div>
+                </div>
+                
+                <div class="court-option" onclick="seleccionarCancha(3)">
+                    <div class="court-icon">
+                        <i class="fas fa-volleyball-ball"></i>
+                    </div>
+                    <div class="court-info">
+                        <h4>Cancha 3 - Interior Techada</h4>
+                        <p>Protección contra el clima, iluminación profesional</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="cancha"><i class="fas fa-map-marker-alt"></i> Cancha Seleccionada</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-volleyball-ball"></i>
+                    <select id="cancha">
+                        <option value="1">Cancha 1 - Arena Profesional</option>
+                        <option value="2">Cancha 2 - Césped Sintético</option>
+                        <option value="3">Cancha 3 - Interior Techada</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="fecha"><i class="fas fa-calendar-day"></i> Fecha</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-calendar"></i>
+                    <input type="date" id="fecha">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="hora"><i class="fas fa-clock"></i> Horario</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-hourglass-start"></i>
+                    <select id="hora">
+                        <option value="15:00">15:00 - 16:00</option>
+                        <option value="16:00">16:00 - 17:00</option>
+                        <option value="17:00">17:00 - 18:00</option>
+                        <option value="18:00">18:00 - 19:00</option>
+                        <option value="19:00">19:00 - 20:00</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="reservar()">
+                <i class="fas fa-check-circle"></i> Confirmar Reserva
+            </button>
+            
+            <div id="msgTurno" class="msg"></div>
+            
+            <div class="footer-note">
+                <p><i class="fas fa-exclamation-circle"></i> Recuerda: Las reservas requieren al menos 2 días de anticipación.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let user = {};
+        let intentos = 0;
+        
+        // Cambiar pantallas
+        function cambiar(id) {
+            document.querySelectorAll(".pantalla").forEach(p => p.classList.remove("visible"));
+            document.getElementById(id).classList.add("visible");
+            
+            // Actualizar nombre de usuario en el panel si está disponible
+            if (id === "panel" && user.nombre) {
+                document.getElementById("userWelcome").textContent = `¡Bienvenida, ${user.nombre}!`;
+            }
+        }
+        
+        // Seleccionar cancha desde las opciones gráficas
+        function seleccionarCancha(num) {
+            document.getElementById("cancha").value = num;
+            
+            // Destacar visualmente la opción seleccionada
+            document.querySelectorAll(".court-option").forEach(option => {
+                option.style.borderColor = "#E8E8E8";
+                option.style.backgroundColor = "#F8F9FF";
+            });
+            
+            // Resaltar la seleccionada
+            event.currentTarget.style.borderColor = "var(--accent)";
+            event.currentTarget.style.backgroundColor = "rgba(174, 198, 207, 0.15)";
+        }
+        
+        // ---------------------- //
+        //  REGISTRO              //
+        // ---------------------- //
+        function registrar() {
+            let nombre = document.getElementById("rNombre").value.trim();
+            let apellido = document.getElementById("rApellido").value.trim();
+            let email = document.getElementById("rEmail").value.trim();
+            let edad = Number(document.getElementById("rEdad").value);
+            let msg = document.getElementById("msgRegistro");
+            
+            // Validación básica de campos vacíos
+            if (!nombre || !apellido || !email || !document.getElementById("rEdad").value) {
+                msg.innerHTML = "<i class='fas fa-exclamation-triangle'></i> Por favor, completa todos los campos requeridos.";
+                msg.className = "msg error-msg";
+                return;
+            }
+            
+            // Validación de formato de email
+            if (!email.includes('@') || !email.includes('.')) {
+                msg.innerHTML = "<i class='fas fa-exclamation-triangle'></i> Ingrese un formato de Email válido.";
+                msg.className = "msg error-msg";
+                return;
+            }
+            
+            if (edad < 18) {
+                msg.innerHTML = "<i class='fas fa-exclamation-circle'></i> El registro solo está disponible para usuarios mayores de 18 años.";
+                msg.className = "msg error-msg";
+                return;
+            }
+            
+            // Creación del objeto user
+            user = {
+                nombre: nombre,
+                apellido: apellido,
+                email: email,
+                pass: Math.random().toString(36).substring(2, 10)
+            };
+            
+            msg.className = "msg success-msg";
+            msg.innerHTML = `
+                <i class='fas fa-check-circle'></i> <strong>¡Registro Exitoso!</strong><br>
+                Tu contraseña temporal es: <strong>${user.pass}</strong><br>
+                <small>Guárdala en un lugar seguro. Serás redirigido al login en 10 segundos.</small>
+            `;
+            
+            // Limpiar formulario
+            document.getElementById("rNombre").value = "";
+            document.getElementById("rApellido").value = "";
+            document.getElementById("rEmail").value = "";
+            document.getElementById("rEdad").value = "";
+            
+            // Ocultar mensaje y pasar al login después de 10 segundos
+            setTimeout(() => {
+                msg.innerHTML = "";
+                cambiar("login");
+            }, 10000);
+        }
+        
+        // ---------------------- //
+        //  LOGIN (3 intentos)    //
+        // ---------------------- //
+        function iniciarSesion() {
+            let email = document.getElementById("lEmail").value.trim();
+            let pass = document.getElementById("lPass").value;
+            let msg = document.getElementById("msgLogin");
+            
+            if (!email || !pass) {
+                msg.innerHTML = "<i class='fas fa-exclamation-triangle'></i> Ingrese su email y contraseña.";
+                msg.className = "msg error-msg";
+                return;
+            }
+            
+            // Validar si el usuario existe (simulado)
+            if (!user.email) {
+                msg.innerHTML = "<i class='fas fa-user-slash'></i> El email no se encuentra registrado en el sistema.";
+                msg.className = "msg error-msg";
+                return;
+            }
+            
+            if (email !== user.email || pass !== user.pass) {
+                intentos++;
+                
+                if (intentos >= 3) {
+                    msg.innerHTML = "<i class='fas fa-lock'></i> <strong>Cuenta Bloqueada Temporalmente</strong><br>Se superó el límite de 3 intentos fallidos. Intenta más tarde.";
+                    msg.className = "msg error-msg";
+                    return;
+                }
+                
+                msg.innerHTML = `<i class='fas fa-times-circle'></i> Credenciales incorrectas. Te quedan <strong>${3 - intentos}</strong> intentos.`;
+                msg.className = "msg error-msg";
+                return;
+            }
+            
+            // Login exitoso
+            intentos = 0; // Reiniciar intentos
+            msg.innerHTML = "";
+            cambiar("panel");
+        }
+        
+        function abrirSolicitar() { 
+            cambiar("solicitar"); 
+        }
+        
+        function cerrarSesion() { 
+            // Limpiar campos de login para la siguiente vez
+            document.getElementById("lEmail").value = "";
+            document.getElementById("lPass").value = "";
+            cambiar("login"); 
+        }
+        
+        // ---------------------- //
+        //  RESERVAR TURNO        //
+        // ---------------------- //
+        
+        // Turno ocupado de ejemplo
+        let ocupado = { cancha: "1", fecha: "2025-12-10", hora: "15:00" };
+        
+        function reservar() {
+            let canchaSel = document.getElementById("cancha").value;
+            let fechaSel = document.getElementById("fecha").value;
+            let horaSel = document.getElementById("hora").value;
+            let msg = document.getElementById("msgTurno");
+            
+            if (!fechaSel) {
+                msg.innerHTML = "<i class='fas fa-calendar-times'></i> Por favor, seleccione una fecha válida.";
+                msg.className = "msg error-msg";
+                return;
+            }
+            
+            // Validar 2 días de anticipación
+            let hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            let f = new Date(fechaSel);
+            
+            // Días de diferencia
+            let difTime = f.getTime() - hoy.getTime();
+            let difDays = Math.ceil(difTime / (1000 * 60 * 60 * 24));
+            
+            if (difDays < 2) {
+                msg.innerHTML = "<i class='fas fa-clock'></i> La reserva debe realizarse con un mínimo de <strong>2 días de anticipación</strong>.";
+                msg.className = "msg error-msg";
+                return;
+            }
+            
+            // Validar ocupado (simulación)
+            if (canchaSel === ocupado.cancha && fechaSel === ocupado.fecha && horaSel === ocupado.hora) {
+                msg.innerHTML = `<i class='fas fa-times-circle'></i> <strong>Cancha No Disponible</strong><br>Ya existe una reserva para Cancha ${canchaSel} a las ${horaSel}.`;
+                msg.className = "msg error-msg";
+                return;
+            }
+            
+            // Formatear fecha para mostrar
+            let fechaFormateada = new Date(fechaSel).toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Reserva exitosa
+            msg.className = "msg success-msg";
+            msg.innerHTML = `
+                <i class='fas fa-check-circle'></i> <strong>¡Reserva Confirmada!</strong><br>
+                Cancha ${canchaSel} el ${fechaFormateada} de ${horaSel}.<br>
+                <small>Recibirás un correo de confirmación. ¡A disfrutar del voleibol!</small>
+            `;
+            
+            // Limpiar formulario después de éxito
+            setTimeout(() => {
+                document.getElementById("fecha").value = "";
+                msg.innerHTML = "";
+                cambiar("panel");
+            }, 8000);
+        }
+        
+        // Establecer fecha mínima (hoy + 2 días)
+        window.onload = function() {
+            let hoy = new Date();
+            let minDate = new Date();
+            minDate.setDate(hoy.getDate() + 2);
+            
+            // Formatear a YYYY-MM-DD
+            let dd = String(minDate.getDate()).padStart(2, '0');
+            let mm = String(minDate.getMonth() + 1).padStart(2, '0');
+            let yyyy = minDate.getFullYear();
+            
+            let fechaMinima = yyyy + '-' + mm + '-' + dd;
+            document.getElementById("fecha").setAttribute("min", fechaMinima);
+            
+            // Establecer fecha por defecto (mínima)
+            document.getElementById("fecha").value = fechaMinima;
+        };
+    </script>
+</body>
+</html>
